@@ -1,0 +1,10 @@
+# ============================================
+# Kubernetes Namespace
+# ============================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: task-api
+  labels:
+    app: task-api
+    environment: production
