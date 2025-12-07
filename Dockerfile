@@ -31,8 +31,10 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy application code
+# Copy application code and start script
 COPY src/ ./src/
+COPY start.sh .
+RUN chmod +x start.sh
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -43,12 +45,12 @@ ENV PYTHONUNBUFFERED=1 \
 # Expose port
 EXPOSE 8000
 
-# Health check
+# Health check - use Python to get PORT env var
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/health')" || exit 1
+    CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://localhost:{os.environ.get(\"PORT\", 8000)}/health')" || exit 1
 
-# Use shell form to expand $PORT environment variable
-CMD python -m uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Run the start script
+CMD ["/bin/sh", "./start.sh"]
 
 
 # Stage 3: Development (for local use only)
@@ -70,4 +72,4 @@ ENV PYTHONUNBUFFERED=1 \
 
 EXPOSE 8000
 
-CMD python -m uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000} --reload
+CMD ["/bin/sh", "./start.sh"]
