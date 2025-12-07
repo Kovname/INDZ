@@ -3,7 +3,7 @@ FastAPI Application - Task Management API
 A simple but fully-featured API for CI/CD demonstration
 """
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List
