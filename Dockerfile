@@ -31,10 +31,9 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy application code and start script
+# Copy application code and run script
 COPY src/ ./src/
-COPY start.sh .
-RUN chmod +x start.sh
+COPY run.py .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -45,12 +44,12 @@ ENV PYTHONUNBUFFERED=1 \
 # Expose port
 EXPOSE 8000
 
-# Health check - use Python to get PORT env var
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://localhost:{os.environ.get(\"PORT\", 8000)}/health')" || exit 1
 
-# Run the start script
-CMD ["/bin/sh", "./start.sh"]
+# Run the Python entrypoint
+CMD ["python", "run.py"]
 
 
 # Stage 3: Development (for local use only)
@@ -72,4 +71,4 @@ ENV PYTHONUNBUFFERED=1 \
 
 EXPOSE 8000
 
-CMD ["/bin/sh", "./start.sh"]
+CMD ["python", "run.py"]
