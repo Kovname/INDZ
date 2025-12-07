@@ -1,12 +1,11 @@
 # Railway Configuration
+# Simple config - let Railway auto-detect
 
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-dockerfileTarget = "production"
 
 [deploy]
-# Don't override the CMD - let Dockerfile handle it
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
