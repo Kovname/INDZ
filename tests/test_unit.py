@@ -14,7 +14,7 @@ from pydantic import BaseModel
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from database import Database  # noqa: E402
+from database import Database
 
 
 class MockTaskCreate(BaseModel):

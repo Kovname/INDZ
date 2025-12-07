@@ -11,9 +11,13 @@ from datetime import datetime
 import uvicorn
 import os
 
-# Import our modules
-from .database import Database
-from .metrics import setup_metrics, track_request
+# Import our modules - handle both package and standalone execution
+try:
+    from .database import Database
+    from .metrics import setup_metrics, track_request
+except ImportError:
+    from database import Database
+    from metrics import setup_metrics, track_request
 
 # Initialize FastAPI app
 app = FastAPI(
