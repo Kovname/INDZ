@@ -3,11 +3,10 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-# Use production stage by default
 dockerfileTarget = "production"
 
 [deploy]
-startCommand = "python -m uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+# Don't override the CMD - let Dockerfile handle it
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
