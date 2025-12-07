@@ -1,6 +1,5 @@
 """
 FastAPI Application - Task Management API
-A simple but fully-featured API for CI/CD demonstration
 """
 
 from fastapi import FastAPI, HTTPException, status
@@ -11,7 +10,6 @@ from datetime import datetime
 import uvicorn
 import os
 
-# Import our modules - handle both package and standalone execution
 try:
     from .database import Database
     from .metrics import setup_metrics, track_request
@@ -19,7 +17,6 @@ except ImportError:
     from database import Database
     from metrics import setup_metrics, track_request
 
-# Initialize FastAPI app
 app = FastAPI(
     title="Task Management API",
     description="A demo API for CI/CD pipeline demonstration",
@@ -28,7 +25,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -37,14 +33,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Setup Prometheus metrics
 setup_metrics(app)
 
-# Database instance
 db = Database()
 
 
-# Pydantic Models
 class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
@@ -84,11 +77,9 @@ class HealthCheck(BaseModel):
     database: str
 
 
-# API Endpoints
 @app.get("/", tags=["Root"])
 @track_request
 async def root():
-    """Root endpoint - API info"""
     return {
         "message": "Welcome to Task Management API",
         "version": "1.0.0",
@@ -100,7 +91,6 @@ async def root():
 @app.get("/health", response_model=HealthCheck, tags=["Health"])
 @track_request
 async def health_check():
-    """Health check endpoint for monitoring"""
     db_status = "connected" if db.is_connected() else "disconnected"
     return HealthCheck(
         status="healthy",
@@ -118,14 +108,12 @@ async def get_tasks(
     completed: Optional[bool] = None,
     priority: Optional[str] = None
 ):
-    """Get all tasks with optional filtering"""
     return db.get_tasks(skip=skip, limit=limit, completed=completed, priority=priority)
 
 
 @app.get("/tasks/{task_id}", response_model=Task, tags=["Tasks"])
 @track_request
 async def get_task(task_id: int):
-    """Get a specific task by ID"""
     task = db.get_task(task_id)
     if not task:
         raise HTTPException(
@@ -138,14 +126,12 @@ async def get_task(task_id: int):
 @app.post("/tasks", response_model=Task, status_code=status.HTTP_201_CREATED, tags=["Tasks"])
 @track_request
 async def create_task(task: TaskCreate):
-    """Create a new task"""
     return db.create_task(task)
 
 
 @app.put("/tasks/{task_id}", response_model=Task, tags=["Tasks"])
 @track_request
 async def update_task(task_id: int, task_update: TaskUpdate):
-    """Update an existing task"""
     task = db.update_task(task_id, task_update)
     if not task:
         raise HTTPException(
@@ -158,7 +144,6 @@ async def update_task(task_id: int, task_update: TaskUpdate):
 @app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Tasks"])
 @track_request
 async def delete_task(task_id: int):
-    """Delete a task"""
     success = db.delete_task(task_id)
     if not success:
         raise HTTPException(
@@ -171,11 +156,9 @@ async def delete_task(task_id: int):
 @app.get("/tasks/stats/summary", tags=["Statistics"])
 @track_request
 async def get_stats():
-    """Get task statistics"""
     return db.get_stats()
 
 
-# Run the application
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(

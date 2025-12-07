@@ -1,6 +1,3 @@
-# Railway Configuration
-# Simple config - let Railway auto-detect
-
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
